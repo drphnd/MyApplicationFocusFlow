@@ -1,6 +1,5 @@
 package com.example.myapplicationfocusflow.View
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +17,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.myapplicationfocusflow.model.FocusModel
 import com.example.myapplicationfocusflow.ViewModel.AmbientSoundViewModel
 import com.example.myapplicationfocusflow.ViewModel.FocusCategoryViewModel
@@ -39,21 +39,166 @@ fun FocusSetUpView(
     var focusDuration by remember { mutableStateOf("") }
     var restDuration by remember { mutableStateOf("") }
     var showCategoryDropdown by remember { mutableStateOf(false) }
-
-    // ✅ TAMBAHAN: State untuk handling save operation
     var isSaving by remember { mutableStateOf(false) }
     var saveError by remember { mutableStateOf<String?>(null) }
 
+    // ✅ State untuk dialog add category
+    var showAddCategoryDialog by remember { mutableStateOf(false) }
+    var newCategoryName by remember { mutableStateOf("") }
+    var isAddingCategory by remember { mutableStateOf(false) }
+    var addCategoryError by remember { mutableStateOf<String?>(null) }
+
     val categories by categoryViewModel.categories.collectAsState()
     val scope = rememberCoroutineScope()
-
-    // ✅ TAMBAHAN: Observe error state dari ViewModel
     val viewModelError by focusViewModel.error.collectAsState()
 
-    // ✅ TAMBAHAN: Clear error when user types
     LaunchedEffect(focusName, focusDuration, restDuration) {
         if (saveError != null) saveError = null
         if (viewModelError != null) focusViewModel.clearError()
+    }
+
+    // ✅ Add Category Dialog
+    if (showAddCategoryDialog) {
+        Dialog(onDismissRequest = {
+            showAddCategoryDialog = false
+            newCategoryName = ""
+            addCategoryError = null
+        }) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Black),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Add New Category",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = newCategoryName,
+                        onValueChange = {
+                            newCategoryName = it
+                            if (addCategoryError != null) addCategoryError = null
+                        },
+                        placeholder = { Text("Enter category name", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.Gray,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            cursorColor = Color.White,
+                            errorBorderColor = Color.Red
+                        ),
+                        isError = addCategoryError != null
+                    )
+
+                    // Error message
+                    if (addCategoryError != null) {
+                        Text(
+                            text = addCategoryError!!,
+                            color = Color.Red,
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Cancel Button
+                        OutlinedButton(
+                            onClick = {
+                                showAddCategoryDialog = false
+                                newCategoryName = ""
+                                addCategoryError = null
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White)
+                        ) {
+                            Text("Cancel")
+                        }
+
+                        // Add Button
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    val categoryName = newCategoryName.trim()
+
+                                    when {
+                                        categoryName.isEmpty() -> {
+                                            addCategoryError = "Category name cannot be empty"
+                                        }
+                                        categoryName.length < 2 -> {
+                                            addCategoryError = "Category name must be at least 2 characters"
+                                        }
+                                        categoryName.length > 30 -> {
+                                            addCategoryError = "Category name must be less than 30 characters"
+                                        }
+                                        categories.any { it.name.equals(categoryName, ignoreCase = true) } -> {
+                                            addCategoryError = "Category already exists"
+                                        }
+                                        else -> {
+                                            try {
+                                                isAddingCategory = true
+                                                categoryViewModel.addCategory(categoryName)
+
+                                                // Set kategori baru sebagai selected
+                                                selectedCategory = categoryName
+
+                                                // Close dialog
+                                                showAddCategoryDialog = false
+                                                newCategoryName = ""
+                                                addCategoryError = null
+                                            } catch (e: Exception) {
+                                                addCategoryError = "Failed to add category: ${e.message}"
+                                            } finally {
+                                                isAddingCategory = false
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            ),
+                            enabled = !isAddingCategory && newCategoryName.isNotBlank()
+                        ) {
+                            if (isAddingCategory) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        color = Color.Black,
+                                        strokeWidth = 2.dp
+                                    )
+                                    Text("Adding...")
+                                }
+                            } else {
+                                Text("Add")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Box(
@@ -153,6 +298,7 @@ fun FocusSetUpView(
                     expanded = showCategoryDropdown,
                     onDismissRequest = { showCategoryDropdown = false }
                 ) {
+                    // ✅ Tampilkan semua kategori yang ada
                     categories.forEach { category ->
                         DropdownMenuItem(
                             text = { Text(category.name) },
@@ -162,11 +308,29 @@ fun FocusSetUpView(
                             }
                         )
                     }
+
+                    // ✅ Divider sebelum Add Category
+                    if (categories.isNotEmpty()) {
+                        HorizontalDivider()
+                    }
+
+                    // ✅ Add Category option
                     DropdownMenuItem(
-                        text = { Text("Add Category") },
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    "➕ Add Category",
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Blue
+                                )
+                            }
+                        },
                         onClick = {
-                            // Handle add category
                             showCategoryDropdown = false
+                            showAddCategoryDialog = true
                         }
                     )
                 }
@@ -207,7 +371,6 @@ fun FocusSetUpView(
                     OutlinedTextField(
                         value = focusDuration,
                         onValueChange = { newValue ->
-                            // ✅ Validasi input hanya angka
                             if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
                                 focusDuration = newValue
                             }
@@ -225,7 +388,6 @@ fun FocusSetUpView(
                             cursorColor = Color.White
                         )
                     )
-                    // ✅ Helper text
                     if (focusDuration.toIntOrNull()?.let { it <= 0 || it > 300 } == true) {
                         Text(
                             text = "Duration must be 1-300 minutes",
@@ -244,7 +406,6 @@ fun FocusSetUpView(
                     OutlinedTextField(
                         value = restDuration,
                         onValueChange = { newValue ->
-                            // ✅ Validasi input hanya angka
                             if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
                                 restDuration = newValue
                             }
@@ -262,7 +423,6 @@ fun FocusSetUpView(
                             cursorColor = Color.White
                         )
                     )
-                    // ✅ Helper text
                     if (restDuration.toIntOrNull()?.let { it <= 0 || it > 60 } == true) {
                         Text(
                             text = "Rest must be 1-60 minutes",
@@ -273,7 +433,7 @@ fun FocusSetUpView(
                 }
             }
 
-            // ✅ TAMBAHAN: Error message display
+            // Error message display
             if (saveError != null || viewModelError != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -290,11 +450,10 @@ fun FocusSetUpView(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ✅ PERBAIKAN: Save Button dengan proper error handling
+            // Save Button
             Button(
                 onClick = {
                     scope.launch {
-                        // ✅ Validasi input
                         val focusDurationInt = focusDuration.toIntOrNull()
                         val restDurationInt = restDuration.toIntOrNull()
 
@@ -320,7 +479,6 @@ fun FocusSetUpView(
                                 return@launch
                             }
                             else -> {
-                                // ✅ Proceed with save
                                 try {
                                     isSaving = true
                                     saveError = null
@@ -329,13 +487,12 @@ fun FocusSetUpView(
                                         title = focusName.trim(),
                                         category = selectedCategory,
                                         goals = focusGoals.trim(),
-                                        focusDuration = focusDurationInt, // ✅ Already in minutes
-                                        restDuration = restDurationInt,   // ✅ Already in minutes
-                                        ambientSoundId = null, // ✅ Can be extended later
+                                        focusDuration = focusDurationInt,
+                                        restDuration = restDurationInt,
+                                        ambientSoundId = null,
                                         createdAt = System.currentTimeMillis()
                                     )
 
-                                    // ✅ PERBAIKAN: Handle Result from ViewModel
                                     val result = focusViewModel.saveFocusModel(focusModel)
 
                                     result.fold(
