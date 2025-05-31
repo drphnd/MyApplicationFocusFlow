@@ -1,29 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
+
+<!-- AndroidManifest.xml - Konfigurasi DND yang benar -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    package="com.example.myapplicationfocusflow">
+
+    <!-- ✅ PERMISSION UTAMA UNTUK DND -->
+    <!-- Permission untuk mengakses dan mengubah notification policy (DND) -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
+    <!-- Permission untuk mengubah system settings -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
+    <!-- ✅ PERMISSION TAMBAHAN (OPSIONAL) -->
+    <!-- Untuk akses internet jika diperlukan -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Untuk mencegah device sleep saat app aktif -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Untuk vibration feedback -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".FocusFlowApplication"
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.MyApplicationFocusFlow"
-        tools:targetApi="31">
+        android:theme="@style/Theme.MyApplicationFocusFlow">
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.MyApplicationFocusFlow">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <!-- ✅ NOTIFICATION LISTENER SERVICE (JIKA DIPERLUKAN) -->
+        <!-- Uncomment jika app perlu mendengarkan notifikasi -->
+        <!--
+        <service
+            android:name=".services.NotificationListenerService"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+        -->
+
+    </application>
 </manifest>

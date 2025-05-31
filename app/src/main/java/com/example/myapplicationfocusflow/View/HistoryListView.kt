@@ -39,7 +39,6 @@ fun HistoryListView(
     val focusList by focusViewModel.focusList.collectAsState()
     val sessionsList by sessionViewModel.getAllSessions().collectAsState(initial = emptyList())
 
-    // Gabungkan sessions dengan focus models yang sesuai
     val sessionsWithFocus = remember(sessionsList, focusList) {
         sessionsList.map { session ->
             val focusModel = focusList.find { it.focus_id == session.focusId }
@@ -76,20 +75,6 @@ fun HistoryListView(
                 textAlign = TextAlign.Center,
                 lineHeight = 24.sp
             )
-
-            IconButton(
-                onClick = { /* Add new focus */ },
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(Color.White, CircleShape)
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Add",
-                    tint = Color.Black,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
         }
 
         // History List
