@@ -5,14 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,7 +17,6 @@ import com.example.myapplicationfocusflow.View.FocusSessionView
 import com.example.myapplicationfocusflow.View.FocusSetUpView
 import com.example.myapplicationfocusflow.View.HistoryListView
 import com.example.myapplicationfocusflow.View.HomeView
-import com.example.myapplicationfocusflow.ViewModel.AmbientSoundViewModel
 import com.example.myapplicationfocusflow.ViewModel.FocusCategoryViewModel
 import com.example.myapplicationfocusflow.ViewModel.FocusModeViewModel
 import com.example.myapplicationfocusflow.ViewModel.FocusSessionViewModel
@@ -73,12 +68,10 @@ fun FocusFlowApp(viewModelFactory: ViewModelFactory) {
         composable("focus_setup") {
             val focusModeViewModel: FocusModeViewModel = viewModel(factory = viewModelFactory)
             val categoryViewModel: FocusCategoryViewModel = viewModel(factory = viewModelFactory)
-            val ambientSoundViewModel: AmbientSoundViewModel = viewModel(factory = viewModelFactory)
 
             FocusSetUpView(
                 focusViewModel = focusModeViewModel,
                 categoryViewModel = categoryViewModel,
-                ambientSoundViewModel = ambientSoundViewModel,
                 onSaveClick = { focusModel ->
                     navController.navigate("focus_session/${focusModel.focus_id}")
                 },

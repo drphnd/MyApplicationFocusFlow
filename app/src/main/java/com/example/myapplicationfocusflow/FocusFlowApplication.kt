@@ -2,7 +2,6 @@ package com.example.myapplicationfocusflow
 
 
 import android.app.Application
-import com.example.myapplicationfocusflow.Repositories.AmbientSoundRepository
 import com.example.myapplicationfocusflow.Repositories.FocusCategoryRepository
 import com.example.myapplicationfocusflow.Repositories.FocusModeRepository
 import com.example.myapplicationfocusflow.Repositories.FocusSessionRepository
@@ -15,6 +14,5 @@ class FocusFlowApplication : Application() {
 
     val focusModeRepository by lazy { FocusModeRepository(dataStoreManager) }
     val focusCategoryRepository by lazy { FocusCategoryRepository(dataStoreManager) }
-    val ambientSoundRepository by lazy { AmbientSoundRepository(dataStoreManager) }
     val focusSessionRepository by lazy { FocusSessionRepository(dataStoreManager) }
 }

@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.myapplicationfocusflow.model.FocusModel
-import com.example.myapplicationfocusflow.ViewModel.AmbientSoundViewModel
 import com.example.myapplicationfocusflow.ViewModel.FocusCategoryViewModel
 import com.example.myapplicationfocusflow.ViewModel.FocusModeViewModel
 import kotlinx.coroutines.launch
@@ -29,7 +28,6 @@ import kotlinx.coroutines.launch
 fun FocusSetUpView(
     focusViewModel: FocusModeViewModel,
     categoryViewModel: FocusCategoryViewModel,
-    ambientSoundViewModel: AmbientSoundViewModel,
     onSaveClick: (FocusModel) -> Unit,
     onBackClick: () -> Unit
 ) {

@@ -16,9 +16,6 @@ class ViewModelFactory(private val application: FocusFlowApplication) : ViewMode
             FocusCategoryViewModel::class.java -> {
                 FocusCategoryViewModel(application.focusCategoryRepository) as T
             }
-            AmbientSoundViewModel::class.java -> {
-                AmbientSoundViewModel(application.ambientSoundRepository) as T
-            }
             FocusSessionViewModel::class.java -> {
                 FocusSessionViewModel(application.focusSessionRepository) as T
             }

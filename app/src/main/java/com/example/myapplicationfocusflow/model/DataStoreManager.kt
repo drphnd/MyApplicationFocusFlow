@@ -19,7 +19,6 @@ class DataStoreManager(private val context: Context) {
     companion object {
         private val FOCUS_MODELS_KEY = stringPreferencesKey("focus_models")
         private val CATEGORIES_KEY = stringPreferencesKey("categories")
-        private val AMBIENT_SOUNDS_KEY = stringPreferencesKey("ambient_sounds")
         private val FOCUS_SESSIONS_KEY = stringPreferencesKey("focus_sessions")
         private val NEXT_FOCUS_ID_KEY = stringPreferencesKey("next_focus_id")
         private val NEXT_SESSION_ID_KEY = stringPreferencesKey("next_session_id")
@@ -57,24 +56,6 @@ class DataStoreManager(private val context: Context) {
                 Json.decodeFromString<List<CategoryModel>>(json)
             } catch (e: Exception) {
                 getDefaultCategories()
-            }
-        }
-    }
-
-    // Ambient Sounds
-    suspend fun saveAmbientSounds(sounds: List<AmbientSoundModel>) {
-        context.dataStore.edit { preferences ->
-            preferences[AMBIENT_SOUNDS_KEY] = Json.encodeToString(sounds)
-        }
-    }
-
-    fun getAmbientSounds(): Flow<List<AmbientSoundModel>> {
-        return context.dataStore.data.map { preferences ->
-            val json = preferences[AMBIENT_SOUNDS_KEY] ?: "[]"
-            try {
-                Json.decodeFromString<List<AmbientSoundModel>>(json)
-            } catch (e: Exception) {
-                getDefaultAmbientSounds()
             }
         }
     }
@@ -121,7 +102,6 @@ class DataStoreManager(private val context: Context) {
         return try {
             getFocusModels().first()
             getCategories().first()
-            getAmbientSounds().first()
             getFocusSessions().first()
             true
         } catch (e: Exception) {
@@ -143,16 +123,6 @@ class DataStoreManager(private val context: Context) {
             CategoryModel(3, "Reading"),
             CategoryModel(4, "Exercise"),
             CategoryModel(5, "Meditation")
-        )
-    }
-
-    private fun getDefaultAmbientSounds(): List<AmbientSoundModel> {
-        return listOf(
-            AmbientSoundModel(1, "Rain", "rain.mp3"),
-            AmbientSoundModel(2, "Forest", "forest.mp3"),
-            AmbientSoundModel(3, "Ocean", "ocean.mp3"),
-            AmbientSoundModel(4, "White Noise", "whitenoise.mp3"),
-            AmbientSoundModel(5, "No Sound", "")
         )
     }
 }
