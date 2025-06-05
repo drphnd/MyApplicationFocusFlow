@@ -10,7 +10,6 @@ data class FocusModel(
     val goals: String = "",
     val focusDuration: Int = 0, // in minutes
     val restDuration: Int = 0,  // in minutes
-    val ambientSoundId: Int? = null,
     val isCompleted: Boolean = false,
     val completedSessions: Int = 0,
     val totalSessions: Int = 1,
